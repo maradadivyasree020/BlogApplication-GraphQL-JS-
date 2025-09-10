@@ -1,5 +1,5 @@
-import { Post, Prisma } from "../generated/prisma";
-import { Context } from "../index";
+import { Post, Prisma } from "../../generated/prisma";
+import { Context } from "../../index";
 
 interface PostArgs{
     post:{
@@ -15,7 +15,7 @@ interface PostPayLoadType{
     post: Post | Prisma.Prisma__PostClient<Post> | null
 }
 
-export const Mutation = {
+export const postResolver ={
     postCreate : async(parent: any,{post}: PostArgs,{prisma}: Context) : Promise<PostPayLoadType> => {
         const {title,content}=post
         if(!title || !content){
@@ -26,17 +26,15 @@ export const Mutation = {
                 post: null,
             };
         } 
-        const postData = await prisma.post.create({
+        return{
+            userErrors:[],
+            post:  await prisma.post.create({
                         data:{
                             title,
                             content,
                             authorId:1,
                         },
-        });
-        console.log(post);
-        return{
-            userErrors:[],
-            post: postData
+                    })
         }
     },
     postUpdate : async(parent:any,{ postId, post }: { postId: string; post: PostArgs["post"] },{prisma}:Context) =>{
@@ -107,5 +105,5 @@ export const Mutation = {
             userErrors: [],
             existingPost,
         }
-    }
+    },
 }

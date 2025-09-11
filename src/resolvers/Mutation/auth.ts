@@ -6,10 +6,19 @@ import JWT from "jsonwebtoken"
 import {JSON_SIGNATURE} from "../../keys"
 
 interface SignupArgs{
-    email:string
-    name:string
-    password: string
+    credentials:{
+        email:string
+        password:string
+    }
+    name: string
     bio: string
+}
+
+interface SigninArgs{
+    credentials:{
+        email:string
+        password:string
+    }
 }
 
 interface userPayLoad{
@@ -20,8 +29,9 @@ interface userPayLoad{
 }
 
 export const authResolver = {
-    signup:async (parent: any,{user}: {user:SignupArgs},{prisma}:Context) : Promise<userPayLoad> =>{
-        const { email, name, password, bio } = user;
+    signup:async (parent: any, {credentials,name,bio}:SignupArgs,{prisma}:Context) : Promise<userPayLoad> =>{
+        console.log(credentials,name,bio)
+        const{password,email} =credentials
 
         const isEmail = validator.isEmail(email);
         if(!isEmail){
@@ -82,8 +92,8 @@ export const authResolver = {
         }
 
     },
-    signin:async (parent: any,{user}: {user:SignupArgs},{prisma}:Context) : Promise<userPayLoad> =>{
-        const { email, password } = user;
+    signin:async (parent: any,{credentials}:SigninArgs,{prisma}:Context) : Promise<userPayLoad> =>{
+        const { password,email } = credentials;
 
         const existingUser = await prisma.user.findUnique({
             where: {email}
@@ -100,6 +110,7 @@ export const authResolver = {
         }
 
         const isCorrectPassword = await bcrypt.compare(password,existingUser.password)
+        console.log(existingUser.password)
         if(!isCorrectPassword){
             return{
                 userErrors:[
@@ -111,10 +122,12 @@ export const authResolver = {
             }
         }
 
-        return ({
+        return {
             userErrors:[],
-            token:null
-        })
+            token:JWT.sign({userId:existingUser.id },JSON_SIGNATURE,{
+                expiresIn:36000000,
+            }),
+        }
 
     },  
 

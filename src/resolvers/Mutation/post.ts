@@ -1,5 +1,6 @@
 import { Post, Prisma } from "../../generated/prisma";
 import { Context } from "../../index";
+import { canUserMutatePost } from "../../utils/canUserMutatePost";
 
 interface PostArgs{
     post:{
@@ -45,7 +46,15 @@ export const postResolver ={
                     })
         }
     },
-    postUpdate : async(parent:any,{ postId, post }: { postId: string; post: PostArgs["post"] },{prisma}:Context) =>{
+    postUpdate : async(parent:any,{ postId, post }: { postId: string; post: PostArgs["post"] },{prisma,userInfo}:Context) =>{
+        if(!userInfo){
+            return {
+                userErrors:[{
+                    message: "Forbidden Access"
+                }],
+                post:null,
+            }
+        }
         const {title,content} = post
         if(!title && !content){
             return{
@@ -55,7 +64,14 @@ export const postResolver ={
                 post: null,
             };
         } 
-
+        const error =await canUserMutatePost({
+            userId:userInfo.userId,
+            postId: Number(postId),
+            prisma
+        })
+        if(error){
+            return error
+        }
         const existingPost = await prisma.post.findUnique({
             where:{
                 id:Number(postId)
@@ -90,7 +106,15 @@ export const postResolver ={
             })
         }
     },
-    postDelete : async(parent:any,{postId}:{ postId: string },{prisma}:Context) =>{
+    postDelete : async(parent:any,{postId}:{ postId: string },{prisma,userInfo}:Context) =>{
+        if(!userInfo){
+            return {
+                userErrors:[{
+                    message: "Forbidden Access"
+                }],
+                post:null,
+            }
+        }
         const existingPost =await prisma.post.findUnique({
             where:{
                 id:Number(postId)
@@ -104,6 +128,14 @@ export const postResolver ={
                 post: null,
             }
         };
+        const error =await canUserMutatePost({
+            userId:userInfo.userId,
+            postId: Number(postId),
+            prisma
+        })
+        if(error){
+            return error
+        }
         await prisma.post.delete({
             where:{
                 id:Number(postId)

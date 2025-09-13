@@ -1,4 +1,3 @@
-import { User } from "../../generated/prisma";
 import { Context } from "../../index";
 import validator from "validator"
 import bcrypt from "bcryptjs"

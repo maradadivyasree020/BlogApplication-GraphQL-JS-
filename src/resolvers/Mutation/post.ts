@@ -16,7 +16,15 @@ interface PostPayLoadType{
 }
 
 export const postResolver ={
-    postCreate : async(parent: any,{post}: PostArgs,{prisma}: Context) : Promise<PostPayLoadType> => {
+    postCreate : async(parent: any,{post}: PostArgs,{prisma,userInfo}: Context) : Promise<PostPayLoadType> => {
+        if(!userInfo){
+            return {
+                userErrors:[{
+                    message: "Forbidden Access"
+                }],
+                post:null,
+            }
+        }
         const {title,content}=post
         if(!title || !content){
             return{
@@ -32,7 +40,7 @@ export const postResolver ={
                         data:{
                             title,
                             content,
-                            authorId:1,
+                            authorId:userInfo.userId,
                         },
                     })
         }

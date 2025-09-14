@@ -29,7 +29,7 @@ interface userPayLoad{
 
 export const authResolver = {
     signup:async (parent: any, {credentials,name,bio}:SignupArgs,{prisma}:Context) : Promise<userPayLoad> =>{
-        console.log(credentials,name,bio)
+        // console.log(credentials,name,bio)
         const{password,email} =credentials
 
         const isEmail = validator.isEmail(email);
@@ -120,12 +120,13 @@ export const authResolver = {
                 token: null
             }
         }
-
+        const token = JWT.sign({userId:existingUser.id },JSON_SIGNATURE,{
+                expiresIn:36000000,
+            })
+        console.log(token)
         return {
             userErrors:[],
-            token:JWT.sign({userId:existingUser.id },JSON_SIGNATURE,{
-                expiresIn:36000000,
-            }),
+            token:token,
         }
 
     },  

@@ -106,7 +106,7 @@ export const postResolver ={
             })
         }
     },
-    postDelete : async(parent:any,{postId}:{ postId: string },{prisma,userInfo}:Context) =>{
+    postDelete : async(parent:any,{postId}:{ postId: string},{prisma,userInfo}:Context) =>{
         if(!userInfo){
             return {
                 userErrors:[{
@@ -144,6 +144,98 @@ export const postResolver ={
         return {
             userErrors: [],
             existingPost,
+        }
+    },
+    postPublish : async(parent:any,{postId}:{ postId: string},{prisma,userInfo}:Context) =>{
+        if(!userInfo){
+            return {
+                userErrors:[{
+                    message: "Forbidden Access"
+                }],
+                post:null,
+            }
+        }
+        const existingPost =await prisma.post.findUnique({
+            where:{
+                id:Number(postId)
+            }
+        })
+        if(!existingPost){
+            return{
+                userErrors:[{
+                    message: "Post does not exist"
+                }],
+                post: null,
+            }
+        };
+        const error =await canUserMutatePost({
+            userId:userInfo.userId,
+            postId: Number(postId),
+            prisma
+        })
+        if(error){
+            return error
+        }
+        await prisma.post.update({
+            where: {
+                id: Number(postId)
+            },
+            data: {
+                published: true 
+            }
+        });
+
+        return {
+            userErrors: [{
+                message :"Post published",
+            }],
+            post:null
+        }
+    },
+    postunPublish : async(parent:any,{postId}:{ postId: string},{prisma,userInfo}:Context) =>{
+        if(!userInfo){
+            return {
+                userErrors:[{
+                    message: "Forbidden Access"
+                }],
+                post:null,
+            }
+        }
+        const existingPost =await prisma.post.findUnique({
+            where:{
+                id:Number(postId)
+            }
+        })
+        if(!existingPost){
+            return{
+                userErrors:[{
+                    message: "Post does not exist"
+                }],
+                post: null,
+            }
+        };
+        const error =await canUserMutatePost({
+            userId:userInfo.userId,
+            postId: Number(postId),
+            prisma
+        })
+        if(error){
+            return error
+        }
+        await prisma.post.update({
+            where: {
+                id: Number(postId)
+            },
+            data: {
+                published: false 
+            }
+        });
+
+        return {
+            userErrors: [{
+                message :"Post unPublished",
+            }],
+            post:null
         }
     },
 }

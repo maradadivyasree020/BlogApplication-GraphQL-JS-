@@ -83,7 +83,7 @@ export const authResolver = {
         const token = await JWT.sign({
             userId: createdUser.id,
         },JSON_SIGNATURE,{
-            expiresIn:360000,
+            expiresIn:"30d",
         })
         return{
             userErrors:[],
@@ -121,7 +121,7 @@ export const authResolver = {
             }
         }
         const token = JWT.sign({userId:existingUser.id },JSON_SIGNATURE,{
-                expiresIn:36000000,
+                expiresIn:"30d",
             })
         console.log(token)
         return {

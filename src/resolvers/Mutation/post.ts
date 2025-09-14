@@ -106,7 +106,7 @@ export const postResolver ={
             })
         }
     },
-    postDelete : async(parent:any,{postId}:{ postId: string},{prisma,userInfo}:Context) =>{
+    postDelete : async(parent:any,{postId}:{ postId: string },{prisma,userInfo}:Context) =>{
         if(!userInfo){
             return {
                 userErrors:[{

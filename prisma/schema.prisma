@@ -34,14 +34,16 @@ model User{
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   posts Post[]
-  profile Profile?
+  profile Profile[]
 }
 
 model Profile{
   id Int @id @default(autoincrement())
+  name String
   bio String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  userId Int @unique
-  user User @relation(fields: [userId],references: [id])
+  userId Int 
+  author User @relation(fields: [userId], references: [id])
+
 }

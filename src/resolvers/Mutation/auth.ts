@@ -75,6 +75,7 @@ export const authResolver = {
 
         await prisma.profile.create({
             data: {
+                name,
                 bio,
                 userId: createdUser.id, 
             }

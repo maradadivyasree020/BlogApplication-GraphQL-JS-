@@ -38,5 +38,27 @@ export const Query = {
             //     message:null
             // },
         
+    },
+    profile: async(parent:any,args:any,{prisma,userInfo}:Context) =>{
+        const userId=userInfo?.userId;
+        if(userId){
+            const user = await prisma.user.findUnique({
+                where:{
+                    id:userId,
+                },
+                include: {profile:true, posts:true },
+            })
+            if(user){
+                const profiles = await prisma.profile.findMany({
+                    where: {
+                        userId: userId,
+                    },
+                });
+                console.log(profiles)
+                return profiles
+            }
+            // return null;
+        }
+        // return null;
     }
 }

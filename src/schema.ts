@@ -4,6 +4,7 @@ export const typeDefs = gql`
     type Query{
         me:User
         posts: [Post!]!
+        profile: [Profile!]!
     }
     
     type Mutation{
@@ -14,6 +15,7 @@ export const typeDefs = gql`
         postunPublish(postId: ID!):PostPayLoad!
         signup(credentials: CredentialsInput!,name: String!,bio: String!):AuthPayLoad!
         signin(credentials: CredentialsInput!):AuthPayLoad!
+        profileCreate(profile:ProfileInput):ProfilePayload
     }
 
     type Post{
@@ -30,13 +32,14 @@ export const typeDefs = gql`
         name:String!
         email: String!
         bio: String!
-        profile: Profile
-        posts: [Post!]!
+        profile: [Profile]
     }
 
     type Profile{
         id: ID!
+        name: String!
         bio: String
+        posts: [Post!]!
         user: [User!]!
     }
 
@@ -52,6 +55,16 @@ export const typeDefs = gql`
     type AuthPayLoad{
         userErrors:[UserError!]!
         token: String
+    }
+
+    type ProfilePayload{
+        userErrors:[UserError!]!
+        profile: Profile
+    }
+
+    input ProfileInput{
+        name:String,
+        bio:String
     }
 
     input PostInput{

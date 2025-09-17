@@ -8,6 +8,9 @@ export const Query = {
         const take = 3; // posts per page
         const skip = (page - 1) * take;
         const posts= await prisma.post.findMany({
+            where: {
+                authorId: args.userId, // filter posts by authenticated user
+            },
             skip:skip,
             take:take,
             orderBy:[
@@ -16,6 +19,7 @@ export const Query = {
                 },
             ]
         })
+        console.log(posts)
         return posts
     },
     me: async (parent : any,args:any,{prisma,userInfo}:Context) =>{

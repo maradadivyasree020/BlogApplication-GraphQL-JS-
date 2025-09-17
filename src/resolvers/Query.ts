@@ -4,7 +4,12 @@ import { getUserFromToken } from "../utils/getUserFromToken"
 
 export const Query = {
     posts: async (parent: any,args: any,{prisma}: Context) => {
+        const page = args.page || 1;
+        const take = 3; // posts per page
+        const skip = (page - 1) * take;
         const posts= await prisma.post.findMany({
+            skip:skip,
+            take:take,
             orderBy:[
                 {
                     createdAt:"desc"

@@ -1,9 +1,20 @@
 import { gql } from "apollo-server";
 
 export const typeDefs = gql`
+
+    enum SortDirection {
+        asc
+        desc
+    }
+
+    enum PostSortableField {
+        createdAt
+        title
+    }
+
     type Query{
         me:User
-        posts(page:Int,userId:Int!): [Post!]!
+        posts(page:Int,userId:Int!,orderBy: PostSortableField = createdAt,sortDirection: SortDirection = desc): [Post!]!
     }
     
     type Mutation{

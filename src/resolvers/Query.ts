@@ -7,17 +7,17 @@ export const Query = {
         const page = args.page || 1;
         const take = 3; // posts per page
         const skip = (page - 1) * take;
+        const orderByField = args.orderBy || 'createdAt';
+        const sortDirection = args.sortDirection || 'desc';
         const posts= await prisma.post.findMany({
             where: {
                 authorId: args.userId, // filter posts by authenticated user
             },
             skip:skip,
             take:take,
-            orderBy:[
-                {
-                    createdAt:"desc"
-                },
-            ]
+            orderBy:{
+                [orderByField]:sortDirection,
+            }
         })
         console.log(posts)
         return posts
